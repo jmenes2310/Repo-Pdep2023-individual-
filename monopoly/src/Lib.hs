@@ -4,7 +4,7 @@ data Participante = UnParticipante {
     nombre      ::String,
     dinero      ::Int,
     tactica     ::String,
-    propriedades::[Propiedad],
+    propiedades::[Propiedad],
     acciones    ::[Accion]
     } deriving Show
 
@@ -27,11 +27,11 @@ cambiarTacticaACompradorCompulsivo::Participante->Participante
 cambiarTacticaACompradorCompulsivo unParticipante = unParticipante {tactica = "Comprador compulsivo"}
 
 carolina :: Participante
-carolina = UnParticipante {nombre ="Carolina", dinero= 500, tactica ="Accionista",acciones =[pasarPorBanco], propriedades =[]}
+carolina = UnParticipante {nombre ="Carolina", dinero= 500, tactica ="Accionista",acciones =[pasarPorBanco], propiedades =[]}
 --carolina = unParticipante "Carolina"  500 "Accionista" [] [pasarPorBanco] 
 
 manuel :: Participante
-manuel = UnParticipante {nombre ="Manuel", dinero= 500, tactica ="oferente singular",acciones =[pasarPorBanco,enojarse], propriedades =[]}
+manuel = UnParticipante {nombre ="Manuel", dinero= 500, tactica ="oferente singular",acciones =[pasarPorBanco,enojarse], propiedades =[]}
 
 enojarse :: Accion
 enojarse unParticipante = (agregarAccion gritar . agregarDinero 50) unParticipante
@@ -42,3 +42,13 @@ agregarAccion unaAccion unParticipante = unParticipante {acciones = acciones unP
 gritar::Accion
 gritar unParticipante = unParticipante {nombre ="AHHHH" ++ nombre unParticipante }
  
+subastar :: Propiedad -> Accion
+subastar unaPropiedad unParticipante 
+    |evaluarTactica unParticipante = agregoPropiedadYrestoDinero unaPropiedad unParticipante
+    |otherwise = unParticipante
+    
+agregoPropiedadYrestoDinero :: Propiedad -> Participante ->Participante
+agregoPropiedadYrestoDinero (nombrePropiedad,valorPropiedad) unParticipante = unParticipante {dinero= dinero unParticipante - valorPropiedad, propiedades = (nombrePropiedad,valorPropiedad) : propiedades unParticipante}
+
+evaluarTactica :: Participante -> Bool
+evaluarTactica unParticipante = tactica unParticipante  == "Accionista" || tactica unParticipante  == "oferente singular"
