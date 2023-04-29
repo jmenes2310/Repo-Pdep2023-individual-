@@ -30,8 +30,8 @@ carolina :: Participante
 carolina = UnParticipante {nombre ="Carolina", dinero= 500, tactica ="Accionista",acciones =[pasarPorBanco], propriedades =[]}
 --carolina = unParticipante "Carolina"  500 "Accionista" [] [pasarPorBanco] 
 
-{-manuel :: Participante
-manuel = UnParticipante {nombre ="Manuel", dinero= 500, tactica ="oferente singular",acciones =[pasarPorBanco,enojarse], propriedades =[]}-}
+manuel :: Participante
+manuel = UnParticipante {nombre ="Manuel", dinero= 500, tactica ="oferente singular",acciones =[pasarPorBanco,enojarse], propriedades =[]}
 
 enojarse :: Accion
 enojarse unParticipante = (agregarAccion gritar . agregarDinero 50) unParticipante
