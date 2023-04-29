@@ -1,4 +1,0 @@
-este es un archivo de prueba a la hora de clonar un repositorio
-	- esta es la primera modificacion para probar git
-	- segunda modificacion
-
