@@ -1,4 +1,4 @@
-# Changelog for `ejemplo`
+# Changelog for `monopoly`
 
 All notable changes to this project will be documented in this file.
 
