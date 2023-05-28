@@ -1,18 +1,23 @@
 import Text.Show.Functions ()
 
-data Participante = Participante {
+data Participante = UnParticipante {
     nombre :: String,
     especialidad :: Plato,
     trucos :: [Truco]
 } deriving Show
 
-data Plato = Plato {
+data Plato = UnPlato {
     dificultad :: Int,
     ingredientes :: [Componente]
 } deriving Show
 
 type Truco = (Plato ->Plato)
 type Componente = (String,Int)
+
+--platos de prueba:
+pizza :: Plato
+pizza = UnPlato {dificultad=2 , ingredientes=[("leche",1000),("sal",20),("harina",10),("salsa", 200),("queso",400)]}
+
 
 endulzar :: Int -> Truco
 endulzar cantidad unPlato = agregarComponente "azucar" cantidad unPlato
@@ -26,7 +31,7 @@ agregarComponente nombre cantidad unPlato = unPlato {ingredientes=  (nombre , ca
 darSabor :: Int->Int ->Truco
 darSabor sal  azucar  unPlato = (salar sal).(endulzar azucar) $ unPlato
 
-duplicarPorcion :: Plato -> Plato
+duplicarPorcion :: Truco
 duplicarPorcion unPlato = unPlato {ingredientes= map multiplicarCantidadPor2 (ingredientes unPlato)}
 
 multiplicarCantidadPor2 :: Componente ->Componente
@@ -43,11 +48,64 @@ esUnBardo unPlato = dificultad unPlato >7 && length (ingredientes unPlato) >5
 hayMucho :: Componente->Bool
 hayMucho unComponente = snd unComponente >10
 
+--vegano
 esVegano :: Plato -> Bool
-esVegano unPlato = any cosasNoVeganas (sacarNombreComponetes unPlato) 
+esVegano unPlato = not (algunIngredienteDe unPlato tieneCosasNoVeganas)
 
-sacarNombreComponetes :: Plato->[String]
-sacarNombreComponetes unPlato = map fst (ingredientes unPlato)
+tieneCosasNoVeganas :: Componente ->Bool
+tieneCosasNoVeganas (ingrediente,_) = elem ingrediente cosasNoVeganas
 
 cosasNoVeganas :: [String]
-cosasNoVeganas = ["carne", "huevo", "leche", "queso","yogurth"]
+cosasNoVeganas = ["carne", "huevo", "leche", "queso","yogurth","manteca"]
+
+--sin tacc
+esSinTacc:: Plato -> Bool
+esSinTacc unPlato= not (algunIngredienteDe unPlato tieneHarina)
+
+tieneHarina :: Componente->Bool
+tieneHarina (ingrediente,_) = ingrediente == "harina"
+
+--hipertension
+noAptoHipertension :: Plato ->Bool
+noAptoHipertension unPlato = algunIngredienteDe unPlato cantidadDeSalMayoA2
+
+cantidadDeSalMayoA2 :: Componente ->Bool
+cantidadDeSalMayoA2 (ingrediente,cantidad) = ingrediente == "sal" && cantidad >2 
+
+algunIngredienteDe :: Plato->(Componente->Bool) ->Bool
+algunIngredienteDe unPlato unaFuncion = any unaFuncion (ingredientes unPlato)
+
+
+pepeRonccino :: Participante
+pepeRonccino = UnParticipante {nombre = "Pepe Ronccino", especialidad = platoComplejo, trucos = [darSabor 2 5 , simplificar , duplicarPorcion]}
+
+platoComplejo :: Plato
+platoComplejo = UnPlato {dificultad=8,ingredientes= [("sal",20),("azucar",10),("harina",500),("manteca",100),("leche",200),("carne",600)]}
+
+
+--funcionalidades
+cocinar :: Participante ->Plato ->Plato
+cocinar unParticipante unPlato = foldr (aplicarUnTruco) unPlato (trucos unParticipante)
+
+aplicarUnTruco :: Truco ->Plato->Plato
+aplicarUnTruco unTruco unPlato = unTruco unPlato
+
+esMejorQue :: Plato->Plato->Plato
+esMejorQue unPlato otroPlato
+    |(dificultad unPlato > dificultad otroPlato) && (sumaDePesosDeSusIngredientes unPlato < sumaDePesosDeSusIngredientes otroPlato) = unPlato
+    |otherwise = otroPlato
+
+sumaDePesosDeSusIngredientes :: Plato ->Int
+sumaDePesosDeSusIngredientes unPlato = sum(map snd (ingredientes unPlato))
+
+participanteEstrella :: [Participante]->Plato->Participante
+participanteEstrella listaParticipantes unPlato = foldr1 (mejorParticipante unPlato) listaParticipantes
+
+mejorParticipante :: Plato ->Participante->Participante->Participante
+mejorParticipante unPlato unParticipante otroParticipante
+    | ingredientes (esMejorQue (cocinar unParticipante unPlato) (cocinar otroParticipante unPlato)) == ingredientes (cocinar unParticipante unPlato) && dificultad  (esMejorQue (cocinar unParticipante unPlato) (cocinar otroParticipante unPlato)) == dificultad (cocinar unParticipante unPlato) = unParticipante
+    |otherwise = otroParticipante
+
+
+platinum :: Plato
+platinum = UnPlato {dificultad =10, ingredientes = cycle[("Ingrediente", 1), ("Ingrediente", 2), ("Ingrediente", 3)]}
