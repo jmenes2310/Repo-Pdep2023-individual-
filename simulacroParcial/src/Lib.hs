@@ -67,10 +67,10 @@ tieneHarina (ingrediente,_) = ingrediente == "harina"
 
 --hipertension
 noAptoHipertension :: Plato ->Bool
-noAptoHipertension unPlato = algunIngredienteDe unPlato cantidadDeSalMayoA2
+noAptoHipertension unPlato = algunIngredienteDe unPlato tieneMasDe2GramosDeSal
 
-cantidadDeSalMayoA2 :: Componente ->Bool
-cantidadDeSalMayoA2 (ingrediente,cantidad) = ingrediente == "sal" && cantidad >2 
+tieneMasDe2GramosDeSal :: Componente ->Bool
+tieneMasDe2GramosDeSal (ingrediente,cantidad) = ingrediente == "sal" && cantidad >2 
 
 algunIngredienteDe :: Plato->(Componente->Bool) ->Bool
 algunIngredienteDe unPlato unaFuncion = any unaFuncion (ingredientes unPlato)
@@ -84,28 +84,29 @@ platoComplejo = UnPlato {dificultad=8,ingredientes= [("sal",20),("azucar",10),("
 
 
 --funcionalidades
-cocinar :: Participante ->Plato ->Plato
-cocinar unParticipante unPlato = foldr (aplicarUnTruco) unPlato (trucos unParticipante)
+cocinar :: Participante ->Plato
+cocinar unParticipante = foldr (aplicarUnTruco) (especialidad unParticipante) (trucos unParticipante)
 
 aplicarUnTruco :: Truco ->Plato->Plato
 aplicarUnTruco unTruco unPlato = unTruco unPlato
 
-esMejorQue :: Plato->Plato->Plato
-esMejorQue unPlato otroPlato
-    |(dificultad unPlato > dificultad otroPlato) && (sumaDePesosDeSusIngredientes unPlato < sumaDePesosDeSusIngredientes otroPlato) = unPlato
-    |otherwise = otroPlato
+esMejorQue :: Plato->Plato->Bool
+esMejorQue unPlato otroPlato = (dificultad unPlato > dificultad otroPlato) && (sumaDePesosDeSusIngredientes unPlato < sumaDePesosDeSusIngredientes otroPlato)
 
 sumaDePesosDeSusIngredientes :: Plato ->Int
 sumaDePesosDeSusIngredientes unPlato = sum(map snd (ingredientes unPlato))
 
-participanteEstrella :: [Participante]->Plato->Participante
-participanteEstrella listaParticipantes unPlato = foldr1 (mejorParticipante unPlato) listaParticipantes
+participanteEstrella :: [Participante]->Participante
+participanteEstrella listaParticipantes  = foldr1 (mejorParticipante) listaParticipantes
 
-mejorParticipante :: Plato ->Participante->Participante->Participante
-mejorParticipante unPlato unParticipante otroParticipante
-    | ingredientes (esMejorQue (cocinar unParticipante unPlato) (cocinar otroParticipante unPlato)) == ingredientes (cocinar unParticipante unPlato) && dificultad  (esMejorQue (cocinar unParticipante unPlato) (cocinar otroParticipante unPlato)) == dificultad (cocinar unParticipante unPlato) = unParticipante
+mejorParticipante :: Participante->Participante->Participante
+mejorParticipante  unParticipante otroParticipante
+    | esMejorQue (cocinar unParticipante) (cocinar otroParticipante) =unParticipante
     |otherwise = otroParticipante
 
 
 platinum :: Plato
-platinum = UnPlato {dificultad =10, ingredientes = cycle[("Ingrediente", 1), ("Ingrediente", 2), ("Ingrediente", 3)]}
+platinum = UnPlato {dificultad =10, ingredientes = unaListaDeIngredientesRara}
+
+unaListaDeIngredientesRara :: [Componente]
+unaListaDeIngredientesRara = map (\unNumero -> ("Ingrediente" ++ show unNumero,unNumero)) [1..]
