@@ -13,7 +13,7 @@ type Objeto = String
 juan :: Persona
 juan = Persona {nombre= "Juan",calorias= 1020,hidratacion=20,tiempoLibre=2,equipamiento=["pesa","pesa","pesa","pesa"]}
 
-type Ejercicio = (Int ->Persona->Persona)
+type Ejercicio = (Int->Persona->Persona)
 
 abdominales ::Ejercicio
 abdominales repeticiones unaPersona = modificarCalorias (*) (-) repeticiones 8 unaPersona
@@ -66,10 +66,10 @@ comerUnSandwich unaPersona = modificarCalorias (*) (+) 1 500 unaPersona{hidratac
 
 --PARTE B
 
-type Rutina = [Ejercicio]
+type Rutina = [(Persona->Persona)]
 
-esPeligrosa :: Persona->Int->Rutina->Bool
-esPeligrosa unaPersona repeticiones unaRutina = estadoPeligroso ( foldr (realizarUnEjercicio repeticiones) unaPersona unaRutina)
+esPeligrosa :: Persona->Int->[(Int->Persona->Persona)]->Bool
+esPeligrosa unaPersona repeticiones unaRutina = estadoPeligroso (realizarUnaRutina  unaRutina repeticiones unaPersona)
 
 realizarUnEjercicio :: Int->(Int->Persona->Persona) ->Persona->Persona
 realizarUnEjercicio repeticiones unEjercicio  unaPersona = unEjercicio repeticiones unaPersona
@@ -77,8 +77,31 @@ realizarUnEjercicio repeticiones unEjercicio  unaPersona = unEjercicio repeticio
 estadoPeligroso :: Persona ->Bool
 estadoPeligroso unaPersona = calorias unaPersona <50 && hidratacion unaPersona <10
 
-esBalanceada ::Persona->Int->Rutina->Bool
-esBalanceada unaPersona repeticiones unaRutina = estadoBalanceado unaPersona ( foldr (realizarUnEjercicio repeticiones) unaPersona unaRutina)
+esBalanceada ::Persona->Int->[(Int->Persona->Persona)]->Bool
+esBalanceada unaPersona repeticiones unaRutina = estadoBalanceado unaPersona (realizarUnaRutina  unaRutina repeticiones unaPersona)
 
 estadoBalanceado :: Persona->Persona->Bool
 estadoBalanceado unaPersona personaLuegoDeRutina= hidratacion personaLuegoDeRutina >80 && (calorias personaLuegoDeRutina < div (calorias unaPersona) 2)
+
+elAbominableAbdominal :: Rutina
+elAbominableAbdominal = map abdominales [1..]
+
+seleccionarGrupoDeEjercicio :: Persona->[Persona]->[Persona]
+seleccionarGrupoDeEjercicio unaPersona personas = filter (tienenMismoTiempoLibre unaPersona) personas
+
+tienenMismoTiempoLibre :: Persona->Persona->Bool
+tienenMismoTiempoLibre unaPersona otraPersona = tiempoLibre unaPersona == tiempoLibre otraPersona
+
+type PromedioRutina = (Int,Int)
+
+promedioDeRutina :: Int-> [(Int->Persona->Persona)]->[Persona]->PromedioRutina
+promedioDeRutina repeticiones unaRutina personas = (promedio calorias repeticiones unaRutina personas , promedio hidratacion repeticiones unaRutina personas)
+
+promedio :: (Persona->Int)->Int-> [(Int->Persona->Persona)]->[Persona]->Int
+promedio operacion repeticiones unaRutina personas = div (sum.(map operacion) . (todoHacenLaRutina repeticiones unaRutina) $ personas) (length personas)
+
+todoHacenLaRutina :: Int->[(Int->Persona->Persona)]->[Persona]->[Persona]
+todoHacenLaRutina repeticiones unaRutina personas = map (realizarUnaRutina unaRutina repeticiones) personas
+
+realizarUnaRutina :: [(Int->Persona->Persona)]->Int->Persona->Persona
+realizarUnaRutina  unaRutina repeticiones unaPersona = foldr (realizarUnEjercicio repeticiones) unaPersona unaRutina
