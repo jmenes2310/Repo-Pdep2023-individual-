@@ -57,39 +57,44 @@ type Golpe = (Jugador->Palo->Tiro)
 golpe :: Golpe
 golpe unJugador unPalo = unPalo (habilidad unJugador)
 
-type Obstaculo = (Tiro ->Bool)
+--PUNTO 3
 
-superaObstaculo:: Obstaculo ->Tiro->Bool
-superaObstaculo unObstaculo unTiro = unObstaculo unTiro
+type CondicionDeObstaculo = (Tiro ->Bool)
 
-condicionTunelConRampita :: Obstaculo
+--superaObstaculo:: (Tiro ->Bool) ->Tiro->Bool
+--superaObstaculo unaCondicion unTiro = unaCondicion unTiro
+
+condicionTunelConRampita :: CondicionDeObstaculo
 condicionTunelConRampita unTiro = precision unTiro >90
 
 tunelConRampita :: Tiro->Tiro
 tunelConRampita unTiro
-    |superaObstaculo condicionTunelConRampita unTiro = efectoTunelConRampita unTiro 
+    |condicionTunelConRampita unTiro = efectoLagunaYTunel (*) 2 unTiro{precision=100,altura=0} 
     |otherwise = tiroNulo
 
-efectoTunelConRampita :: Tiro ->Tiro
-efectoTunelConRampita unTiro = unTiro {velocidad=velocidad unTiro *2,precision= 100,altura=0}
+{-efectoTunelConRampita :: Tiro ->Tiro
+efectoTunelConRampita unTiro = efectoLagunaYTunel (*) 2 unTiro{precision=100,altura=0}-}
 
-condicionLaguna :: Obstaculo
+condicionLaguna :: CondicionDeObstaculo
 condicionLaguna unTiro = lagunaUHoyo (altura unTiro) 1 5 (velocidad unTiro) 80 
 
 laguna :: Int->Tiro->Tiro
 laguna largoLaguna unTiro
-    |superaObstaculo condicionLaguna unTiro= efectoLaguna unTiro largoLaguna
+    |condicionLaguna unTiro= efectoLagunaYTunel div largoLaguna unTiro
     |otherwise = tiroNulo
 
-efectoLaguna :: Tiro->Int->Tiro
-efectoLaguna unTiro largoLaguna = unTiro {velocidad=div (velocidad unTiro)largoLaguna}
+{-efectoLaguna :: Tiro->Int->Tiro
+efectoLaguna unTiro largoLaguna = efectoLagunaYTunel div largoLaguna unTiro-}
 
-condicionHoyo :: Obstaculo
+efectoLagunaYTunel :: (Int->Int->Int) ->Int->Tiro ->Tiro
+efectoLagunaYTunel  unaOperacion unNumero unTiro= unTiro {velocidad= (unaOperacion) (velocidad unTiro) unNumero}
+
+condicionHoyo :: CondicionDeObstaculo
 condicionHoyo unTiro = lagunaUHoyo (velocidad unTiro) 5 20 (precision unTiro) 25
 
 hoyo :: Tiro->Tiro
 hoyo unTiro
-    |superaObstaculo condicionHoyo unTiro = tiroNulo
+    |condicionHoyo unTiro = tiroNulo
     |otherwise = tiroNulo
 
 entreDosValores ::Int ->Int -> Int ->Bool
@@ -99,13 +104,13 @@ lagunaUHoyo :: Int ->Int ->Int->Int->Int->Bool
 lagunaUHoyo primerValor segundoValor tercerValor cuartoValor quintoValor = entreDosValores primerValor segundoValor tercerValor && cuartoValor > quintoValor
 
 tiroNulo :: Tiro
-tiroNulo = Tiro {velocidad=0,precision=0,altura=0}
+tiroNulo = Tiro 0 0 0
 
-palosUtiles :: Jugador -> Obstaculo ->[Palo]
+palosUtiles :: Jugador -> (Tiro ->Bool) ->[Palo]
 palosUtiles unJugador unObstaculo = filter (sirve unJugador unObstaculo) palos
 
-sirve :: Jugador -> Obstaculo ->Palo ->Bool
-sirve unJugador unObstaculo unPalo = superaObstaculo unObstaculo (unPalo (habilidad unJugador))
+sirve :: Jugador -> (Tiro ->Bool) ->Palo ->Bool
+sirve unJugador unObstaculo unPalo =  unObstaculo (unPalo (habilidad unJugador))
 
 cuantosObstaculosConsecutivos :: [(Tiro->Tiro)]->Tiro->Int
 cuantosObstaculosConsecutivos obstaculos unTiro = length (takeWhile (loSupera unTiro) obstaculos)
@@ -123,8 +128,6 @@ cualEsMasUtil :: Jugador ->[(Tiro->Tiro)]->Palo->Palo->Palo
 cualEsMasUtil unJugador obstaculos unPalo otroPalo 
     |cuantosObstaculosConsecutivos obstaculos (unPalo (habilidad unJugador)) > cuantosObstaculosConsecutivos obstaculos (otroPalo (habilidad unJugador)) = unPalo
     |otherwise = otroPalo
-
-
 
 listaDePuntos :: [(Jugador,Puntos)]
 listaDePuntos = [(bart,10),(todd,5),(rafa,0)]
