@@ -68,5 +68,17 @@ comerUnSandwich unaPersona = modificarCalorias (*) (+) 1 500 unaPersona{hidratac
 
 type Rutina = [Ejercicio]
 
-esPeligrosa :: Persona->Rutina->Bool
-esPeligrosa unaPersona unaRutina = 
+esPeligrosa :: Persona->Int->Rutina->Bool
+esPeligrosa unaPersona repeticiones unaRutina = estadoPeligroso ( foldr (realizarUnEjercicio repeticiones) unaPersona unaRutina)
+
+realizarUnEjercicio :: Int->(Int->Persona->Persona) ->Persona->Persona
+realizarUnEjercicio repeticiones unEjercicio  unaPersona = unEjercicio repeticiones unaPersona
+
+estadoPeligroso :: Persona ->Bool
+estadoPeligroso unaPersona = calorias unaPersona <50 && hidratacion unaPersona <10
+
+esBalanceada ::Persona->Int->Rutina->Bool
+esBalanceada unaPersona repeticiones unaRutina = estadoBalanceado unaPersona ( foldr (realizarUnEjercicio repeticiones) unaPersona unaRutina)
+
+estadoBalanceado :: Persona->Persona->Bool
+estadoBalanceado unaPersona personaLuegoDeRutina= hidratacion personaLuegoDeRutina >80 && (calorias personaLuegoDeRutina < div (calorias unaPersona) 2)
