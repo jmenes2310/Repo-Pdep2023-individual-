@@ -93,7 +93,7 @@ comienzanConMayuscula lista = all isUpper (map head lista)
 sobrevivientes :: [Barbaro]->Aventura->[Barbaro]
 sobrevivientes barbaros unaAventura = filter (unaAventura) barbaros
 
-sinRepetidos ::[Habilidad] -> [Habilidad]
+sinRepetidos ::Eq a => [a]->[a] --lo hago asi porque nos piden que se elimine los elementos repetidos de una lista, no solo las habilidades
 sinRepetidos []= []
 sinRepetidos (cabeza:cola) 
     |elem cabeza cola = sinRepetidos cola
