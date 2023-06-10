@@ -1,4 +1,6 @@
 import Text.Show.Functions ()
+import Data.List (sortBy)
+
 
 data Carrera = Carrera{
     vueltas :: Int,
@@ -57,13 +59,16 @@ rodra :: Participante
 rodra = Participante "Rodra" 153 0 "Tais" (comboLoco carrerita)
 
 
-daUnaVuelta :: Carrera ->Carrera
-daUnaVuelta unaCarrera = unaCarrera{participantes= map (incrementoVelocidadSegunNombre . (modificarNaftaSegunNombre unaCarrera)) (participantes unaCarrera)} 
+darVuelta :: Carrera ->Carrera
+darVuelta unaCarrera = modificarParticipantesDe unaCarrera
+
+modificarParticipantesDe :: Carrera->Carrera
+modificarParticipantesDe unaCarrera = unaCarrera{participantes= map (incrementoVelocidadSegunNombre . (modificarNaftaSegunNombre unaCarrera)) (participantes unaCarrera)} 
 
 incrementoVelocidadSegunNombre :: Participante->Participante
 incrementoVelocidadSegunNombre unParticipante
-    |(largoDelNombreDe unParticipante) >=1 &&  (largoDelNombreDe unParticipante) <=5 = modificarVelocidad (+) 15 unParticipante
-    |(largoDelNombreDe unParticipante) >=6 &&  (largoDelNombreDe unParticipante) <=8= modificarVelocidad (+) 20 unParticipante
+    |(largoDelNombreDe unParticipante) <=5 = modificarVelocidad (+) 15 unParticipante
+    |(largoDelNombreDe unParticipante) <=8 = modificarVelocidad (+) 20 unParticipante
     |otherwise = modificarVelocidad (+) 30 unParticipante
 
 largoDelNombreDe :: Participante->Int
@@ -71,3 +76,15 @@ largoDelNombreDe unParticipante = length (nombre unParticipante)
 
 modificarNaftaSegunNombre :: Carrera->Participante->Participante
 modificarNaftaSegunNombre unaCarrera unParticipante = modificarNafta (*) (-) (length $ nombre unParticipante) (longitudPista unaCarrera) unParticipante
+
+
+
+
+listaParticipantes :: [Participante]
+listaParticipantes = [rochaMcQueen,biankerr, gushtav,rodra]
+
+deMasLentoAMenosLento :: Participante -> Participante -> Ordering
+deMasLentoAMenosLento participante1 participante2 = compare (velocidad participante1) (velocidad participante2)  -- Orden ascendente
+
+listaParticipantesOrdenados ::  [Participante] -> [Participante] 
+listaParticipantesOrdenados lista = sortBy deMasLentoAMenosLento lista
