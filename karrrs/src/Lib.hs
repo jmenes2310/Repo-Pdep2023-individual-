@@ -44,7 +44,7 @@ comboLoco unaCarrera unParticipante = nitro.(deReversaRocha unaCarrera) $ unPart
 
 --creo una carrera de ejemplo para ponerle a deReversaRocha para que asi qeude del tipo truco
 carrerita :: Carrera
-carrerita = Carrera 60 10 [rochaMcQueen,biankerr,gushtav,rodra] ["Ronco","Tincho","Peti"]
+carrerita = Carrera 3 10 [rochaMcQueen,biankerr,gushtav,rodra] ["Ronco","Tincho","Peti"]
 
 rochaMcQueen :: Participante
 rochaMcQueen = Participante "Rocha McQueen" 282 0 "Ronco" (deReversaRocha carrerita)
@@ -60,7 +60,16 @@ rodra = Participante "Rodra" 153 0 "Tais" (comboLoco carrerita)
 
 
 darVuelta :: Carrera ->Carrera
-darVuelta unaCarrera = modificarParticipantesDe unaCarrera
+darVuelta unaCarrera = aplicarAlmasLento . modificarParticipantesDe $ unaCarrera
+
+aplicarAlmasLento :: Carrera->Carrera
+aplicarAlmasLento unaCarrera = unaCarrera{participantes=alMasLento $ participantes unaCarrera }
+
+alMasLento :: [Participante]->[Participante]
+alMasLento []=[]
+alMasLento  (cabeza : cola)
+    |all ((< (velocidad cabeza)) . velocidad) cola = (truco cabeza cabeza : cola)
+    |otherwise = (cabeza : alMasLento cola)
 
 modificarParticipantesDe :: Carrera->Carrera
 modificarParticipantesDe unaCarrera = unaCarrera{participantes= map (incrementoVelocidadSegunNombre . (modificarNaftaSegunNombre unaCarrera)) (participantes unaCarrera)} 
@@ -75,16 +84,34 @@ largoDelNombreDe :: Participante->Int
 largoDelNombreDe unParticipante = length (nombre unParticipante)
 
 modificarNaftaSegunNombre :: Carrera->Participante->Participante
-modificarNaftaSegunNombre unaCarrera unParticipante = modificarNafta (*) (-) (length $ nombre unParticipante) (longitudPista unaCarrera) unParticipante
+modificarNaftaSegunNombre unaCarrera unParticipante = modificarNafta (*) (-) (largoDelNombreDe unParticipante) (longitudPista unaCarrera) unParticipante
 
+correrCarrera :: Carrera->Carrera
+correrCarrera unaCarrera = foldr ($) unaCarrera (cantidadDeVueltas unaCarrera)
 
+cantidadDeVueltas ::Carrera->[(Carrera->Carrera)]
+cantidadDeVueltas unaCarrera = replicate (vueltas unaCarrera) darVuelta
 
+obtenerGanador :: Carrera->Participante
+obtenerGanador unaCarrera = foldr1 (masRapido) (participantes unaCarrera)
 
-listaParticipantes :: [Participante]
-listaParticipantes = [rochaMcQueen,biankerr, gushtav,rodra]
+masRapido :: Participante->Participante->Participante
+masRapido unParticipante otroParticipante
+    |velocidad unParticipante > velocidad otroParticipante = unParticipante
+    |otherwise = otroParticipante
 
-deMasLentoAMenosLento :: Participante -> Participante -> Ordering
-deMasLentoAMenosLento participante1 participante2 = compare (velocidad participante1) (velocidad participante2)  -- Orden ascendente
+recompetidores :: Carrera->[Participante]
+recompetidores unCarrera = obtenerGanador unCarrera : filter (tieneMasDe27Listros) (participantes unCarrera)
 
-listaParticipantesOrdenados ::  [Participante] -> [Participante] 
-listaParticipantesOrdenados lista = sortBy deMasLentoAMenosLento lista
+tieneMasDe27Listros :: Participante ->Bool
+tieneMasDe27Listros unParticipante = nafta unParticipante > 27
+
+carreraInfinita :: Carrera
+carreraInfinita = Carrera 3 10 (cycle[rochaMcQueen,biankerr,gushtav,rodra]) ["Ronco","Tincho","Peti"]
+
+--no se puede correr ya que al dar una vuelta nunca termina de cambiar las velocidades y nivel de combustible
+--porque son infinitos participantes, por lo tanto tampoco puedo averiguar el mas lento para aplicarle el truco
+
+--no, porque no podemos dar vuelta por lo dicho anteriormente
+
+--no, por lo dicho en la primer respuesta
