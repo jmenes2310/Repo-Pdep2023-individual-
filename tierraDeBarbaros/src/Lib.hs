@@ -22,13 +22,13 @@ amuletosMistico :: Habilidad ->Objeto
 amuletosMistico unaHabilidad unBarbaro = añadirHabilidad unaHabilidad unBarbaro 
 
 varitaDefectuosa :: Objeto
-varitaDefectuosa unBarbaro = añadirHabilidad "hacer magia" . borrarHabilidades $ unBarbaro
+varitaDefectuosa unBarbaro = añadirHabilidad "hacer magia" . desapaecerObjetos $ unBarbaro
 
 añadirHabilidad :: Habilidad ->Barbaro ->Barbaro
 añadirHabilidad unaHabilidad unBarbaro = unBarbaro {habilidades = unaHabilidad : habilidades unBarbaro}
 
-borrarHabilidades :: Barbaro -> Barbaro
-borrarHabilidades unBarbaro = unBarbaro {habilidades = []}
+desapaecerObjetos :: Barbaro -> Barbaro
+desapaecerObjetos unBarbaro = unBarbaro {objetos = []}
 
 ardilla :: Objeto
 ardilla unBarbaro = unBarbaro
@@ -40,7 +40,7 @@ megafono :: Objeto
 megafono unBarbaro = unBarbaro {habilidades= [(ponerEnMayusculas . concatenarHabilidades) $ habilidades unBarbaro]} 
 
 concatenarHabilidades :: [String] ->String
-concatenarHabilidades habilidades = concat habilidades
+concatenarHabilidades listaDeHabilidades = concat listaDeHabilidades
 
 ponerEnMayusculas :: String ->String
 ponerEnMayusculas habilidadesConcatenadas = map toUpper habilidadesConcatenadas
@@ -49,31 +49,32 @@ megafonoBarbarico :: Objeto
 megafonoBarbarico unBarbaro = (cuerda ardilla megafono) unBarbaro
 
 --PUNTO 3
-type Aventura = (Barbaro -> Bool)
+type Evento = (Barbaro -> Bool)
+type Aventura = [Evento]
 
-invasionDeSuciosDuendes :: Aventura
-invasionDeSuciosDuendes unBarbaro = sabeEscribirPoesia unBarbaro
+invasionDeSuciosDuendes :: Evento
+invasionDeSuciosDuendes unBarbaro = sabe "escribir poesria atroz" unBarbaro
 
-sabeEscribirPoesia :: Barbaro -> Bool
-sabeEscribirPoesia unBarbaro = elem "escribir poesia" (habilidades unBarbaro)
+sabe :: String->Barbaro -> Bool
+sabe habilidad unBarbaro = elem habilidad (habilidades unBarbaro)
 
-cremalleraDelTiempo :: Aventura
+cremalleraDelTiempo :: Evento
 cremalleraDelTiempo unBarbaro = unBarbaro `seLlama` "Faffy"  || unBarbaro `seLlama` "Astro" 
 
 seLlama :: Barbaro ->String ->  Bool
 seLlama unBarbaro unNombre = nombre unBarbaro == unNombre
 
-ritualDeFechorias :: Aventura
-ritualDeFechorias unBarbaro = saqueo unBarbaro && gritoDeGuerra unBarbaro && caligrafia unBarbaro
+ritualDeFechorias :: Evento
+ritualDeFechorias unBarbaro = saqueo unBarbaro || gritoDeGuerra unBarbaro || caligrafia unBarbaro
 
-saqueo :: Barbaro -> Bool
-saqueo unBarbaro = unBarbaro `tieneHabilidadDe` "robar" && fuerza unBarbaro >80
-
-tieneHabilidadDe :: Barbaro ->Habilidad->Bool
-tieneHabilidadDe unBarbaro unaHabilidad = elem unaHabilidad (habilidades unBarbaro)
+saqueo :: Barbaro ->Bool
+saqueo unBarbaro =  sabe "robar" unBarbaro && fuerza unBarbaro >80
 
 gritoDeGuerra :: Barbaro -> Bool
-gritoDeGuerra unBarbaro = (length.concatenarHabilidades.habilidades) unBarbaro > length (objetos unBarbaro)
+gritoDeGuerra unBarbaro = poderDeGritoDe unBarbaro > 4 * length (objetos unBarbaro)
+
+poderDeGritoDe :: Barbaro->Int
+poderDeGritoDe unBarbaro =(length.concatenarHabilidades.habilidades) unBarbaro 
 
 caligrafia :: Barbaro -> Bool
 caligrafia unBarbaro = all tienenMasDe3Vocales (habilidades unBarbaro) && comienzanConMayuscula (habilidades unBarbaro)
@@ -91,7 +92,13 @@ comienzanConMayuscula :: [String]->Bool
 comienzanConMayuscula lista = all isUpper (map head lista)
 
 sobrevivientes :: [Barbaro]->Aventura->[Barbaro]
-sobrevivientes barbaros unaAventura = filter (unaAventura) barbaros
+sobrevivientes barbaros unaAventura = filter (sobrevive unaAventura) barbaros
+
+sobrevive :: Aventura -> Barbaro->Bool
+sobrevive unaAventura unBarbaro = all (supera unBarbaro) unaAventura
+
+supera :: Barbaro->Evento->Bool
+supera unBarbaro unEvento = unEvento unBarbaro
 
 sinRepetidos ::Eq a => [a]->[a] --lo hago asi porque nos piden que se elimine los elementos repetidos de una lista, no solo las habilidades
 sinRepetidos []= []
@@ -100,8 +107,14 @@ sinRepetidos (cabeza:cola)
     |otherwise = cabeza : sinRepetidos cola
 
 
+--descendiente :: Barbaro ->[Barbaro]
+--descendiente unBarbaro = map (\unNumero -> utilizarTodosLosObjetos unBarbaro {nombre = nombre unBarbaro ++ (replicate unNumero '*'),habilidades=sinRepetidos (habilidades unBarbaro)}) [1..]
+
 descendiente :: Barbaro ->[Barbaro]
-descendiente unBarbaro = map (\unNumero -> utilizarTodosLosObjetos unBarbaro {nombre = nombre unBarbaro ++ (replicate unNumero '*'),habilidades=sinRepetidos (habilidades unBarbaro)}) [1..]
+descendiente unBarbaro =infinitosDescendientes . utilizarTodosLosObjetos $ unBarbaro {habilidades= sinRepetidos $ habilidades unBarbaro}
+
+infinitosDescendientes::Barbaro->[Barbaro]
+infinitosDescendientes unBarbaro = map (\unNumero-> unBarbaro{nombre=nombre unBarbaro ++ (replicate unNumero '*')}) [1..]
 
 utilizarTodosLosObjetos :: Barbaro ->Barbaro
 utilizarTodosLosObjetos unBarbaro = foldr utilizarObjeto unBarbaro (objetos unBarbaro)

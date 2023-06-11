@@ -30,8 +30,8 @@ serMayor ::Deseos
 serMayor unChico = cambiarEdad (18 - edad unChico) (+) unChico
 
 wanda :: Chico -> Chico
---wanda unChico = head (deseos unChico) unChico {edad=edad unChico +1}
 wanda unChico = (cambiarEdad 1 (+)).head (deseos unChico) $ unChico
+--wanda unChico = head (deseos unChico) unChico {edad=edad unChico +1}
 
 cosmo :: Chico ->Chico
 cosmo unChico = cambiarEdad 2 div unChico
@@ -77,6 +77,14 @@ Chico {nombre = "Rodolfo", edad = 19, habilidades = ["cocina","saber manejar"], 
 -}
 
 --PARTE C
+{-Dada una lista de
+chicos, devuelve la lista de los nombres de
+aquellos que tienen deseos prohibidos. Un deseo
+está prohibido si, al aplicarlo, entre las
+cinco primeras habilidades, hay alguna prohibida.
+En tanto, son habilidades prohibidas enamorar,
+matar y dominar el mundo.-}
+
 habilidadesProhibidos :: Habilidades
 habilidadesProhibidos = ["enamorar","matar","dominar el mundo"]
 
@@ -84,7 +92,7 @@ esHabilidadProhibida :: String ->Bool
 esHabilidadProhibida unaHabilidad = elem unaHabilidad habilidadesProhibidos
 
 esDeseoProhibido :: Chico ->Deseos ->Bool
-esDeseoProhibido unChico unDeseo  = any esHabilidadProhibida ((take 5 . habilidades) $ cumplirDeseo unDeseo unChico)
+esDeseoProhibido unChico unDeseo  = any esHabilidadProhibida ((take 5 . habilidades) $ unDeseo unChico)
 
 tieneDeseoProhibido :: Chico ->Bool
 tieneDeseoProhibido unChico = any (esDeseoProhibido unChico) (deseos unChico)
