@@ -88,10 +88,10 @@ modificarRango operacion unNumero unNinja = unNinja {rangoNinja= max ((rangoNinj
 
 --cumplir una mision
 cumplirMision :: Equipo->Mision->Equipo
-cumplirMision unEquipo unaMision = otorgarRecompensa unaMision . promocionarRango $ unEquipo
+cumplirMision unEquipo unaMision = otorgarRecompensa unaMision .(promocionarRango 1) $ unEquipo
 
-promocionarRango :: Equipo ->Equipo
-promocionarRango unEquipo = map (modificarRango (+) 1) unEquipo
+promocionarRango :: Int->Equipo ->Equipo
+promocionarRango unNumero unEquipo = map (modificarRango (+) unNumero) unEquipo
 
 otorgarRecompensa :: Mision->Equipo->Equipo
 otorgarRecompensa unaMision unEquipo = map (obtenerHerramienta (recompensa unaMision)) unEquipo

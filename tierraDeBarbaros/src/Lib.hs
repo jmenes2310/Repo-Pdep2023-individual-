@@ -110,14 +110,24 @@ sinRepetidos (cabeza:cola)
 --descendiente :: Barbaro ->[Barbaro]
 --descendiente unBarbaro = map (\unNumero -> utilizarTodosLosObjetos unBarbaro {nombre = nombre unBarbaro ++ (replicate unNumero '*'),habilidades=sinRepetidos (habilidades unBarbaro)}) [1..]
 
-descendiente :: Barbaro ->[Barbaro]
+{-descendiente :: Barbaro ->[Barbaro]
 descendiente unBarbaro =infinitosDescendientes . utilizarTodosLosObjetos $ unBarbaro {habilidades= sinRepetidos $ habilidades unBarbaro}
 
 infinitosDescendientes::Barbaro->[Barbaro]
-infinitosDescendientes unBarbaro = map (\unNumero-> unBarbaro{nombre=nombre unBarbaro ++ (replicate unNumero '*')}) [1..]
+infinitosDescendientes unBarbaro = map (\unNumero-> unBarbaro{nombre=nombre unBarbaro ++ (replicate unNumero '*')}) [1..]-}
+
+descendiente :: Barbaro ->[Barbaro]
+descendiente unBarbaro =tail ( iterate (agregarAsterisco . utilizarTodosLosObjetos . habilidadesSinRepetir)  unBarbaro)
+--hay que hacerle tail porque iterate cuando en la cabeza deja el elemento sin aplicar la funcion
+
+habilidadesSinRepetir :: Barbaro->Barbaro
+habilidadesSinRepetir unBarbaro = unBarbaro{habilidades=sinRepetidos (habilidades unBarbaro)}
 
 utilizarTodosLosObjetos :: Barbaro ->Barbaro
 utilizarTodosLosObjetos unBarbaro = foldr utilizarObjeto unBarbaro (objetos unBarbaro)
 
 utilizarObjeto :: Objeto->Barbaro->Barbaro
 utilizarObjeto unObjeto unBarbaro = unObjeto unBarbaro
+
+agregarAsterisco :: Barbaro ->Barbaro
+agregarAsterisco unBarbaro = unBarbaro {nombre = (nombre unBarbaro)++ "*"}
