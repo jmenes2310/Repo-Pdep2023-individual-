@@ -44,40 +44,69 @@ puedeParticiparDe(UnConcierto,UnCantante):-
     concierto(UnConcierto,_,_,UnaCondicion),
     cumpleCon(UnaCondicion,UnCantante).
 
-    cumpleCon(gigante(UnNumero,OtroNumero),UnCantante):-
-        lasCancionesQueSabeSonMasDe(UnNumero,UnCantante),
-        cumpleConTiempoMinimo(OtroNumero,UnCantante).
-        
-        lasCancionesQueSabeSonMasDe(UnaCantidad,UnCantante):-
-            cantidadDeCancionesQueSabe(UnCantante,CantidadQueSabe),
-            CantidadQueSabe >UnaCantidad.
+%funciones auxiliares
+lasCancionesQueSabeSonMasDe(UnaCantidad,UnCantante):-
+    cantidadDeCancionesQueSabe(UnCantante,CantidadQueSabe),
+    CantidadQueSabe>UnaCantidad.
 
-        cantidadDeCancionesQueSabe(UnCantante,CantidadQueSabe):-
-            findall(Cancion,cantante(UnCantante,Cancion,_),CansionesQueSabe),
-            length(CansionesQueSabe,CantidadQueSabe).
+cantidadDeCancionesQueSabe(UnCantante,CantidadQueSabe):-
+    findall(Cancion,cantante(UnCantante,Cancion,_),CansionesQueSabe),
+    length(CansionesQueSabe,CantidadQueSabe).
 
-        cumpleConTiempoMinimo(UnTiempo,UnCantante):-
-            tiempoTotalQueDuranTodasLasCancionesDe(UnCantante,TiempoTotal),
-            TiempoTotal>=UnTiempo.
-    
-    cumpleCon(mediano(UnNumero),UnCantante):-
-        tiempoTotalQueDuranTodasLasCancionesDe(UnCantante,TiempoTotal),
-        TiempoTotal=<UnNumero.
+cumpleConTiempoMinimo(UnTiempo,UnCantante):-
+    tiempoTotalQueDuranTodasLasCancionesDe(UnCantante,TiempoTotal),
+    TiempoTotal>=UnTiempo.
 
-    cumpleCon(pequenio(UnNumero),UnCantante):-
-        cantante(UnCantante,_,UnaDuracion),
-        UnaDuracion>UnNumero.
+cumpleCon(gigante(UnNumero,OtroNumero),UnCantante):-
+    lasCancionesQueSabeSonMasDe(UnNumero,UnCantante),
+    cumpleConTiempoMinimo(OtroNumero,UnCantante).
+cumpleCon(mediano(UnNumero),UnCantante):-
+    tiempoTotalQueDuranTodasLasCancionesDe(UnCantante,TiempoTotal),
+    TiempoTotal=<UnNumero.
+
+cumpleCon(pequenio(UnNumero),UnCantante):-
+    cantante(UnCantante,_,UnaDuracion),
+    UnaDuracion>UnNumero.
 
 elMasFamoso(UnCantante):-
     cantante(UnCantante,_,_),
-    cantante(OtroCantante,_,_),
-    UnCantante\=UnCantante,
-    forall(cantante(UnCantante,_,_),esMasFamoso(UnCantante,OtroCantante)).
+    %UnCantante\=OtroCantante,
+    %forall(cantidadDeFama(_,OtraFama),Fama>=OtraFama).
+    forall(cantante(OtroCantante,_,_),esMasFamoso(UnCantante,OtroCantante)).
 
     esMasFamoso(UnCantante,OtroCantante):-
         cantidadDeFama(UnCantante,UnaCantidad),
         cantidadDeFama(OtroCantante,OtraCantidad),
-        UnaCantidad>OtraCantidad.
+        UnaCantidad>=OtraCantidad.
 
-    cantidadDeFama(UnCantante,UnaCantidad):-
-        
+    cantidadDeFama(UnCantante,UnaCantidadDeFama):-
+        cantante(UnCantante,_,_),
+        findall(Fama,distinct(famaQueDaUnCocientoA(UnCantante,Fama)),FamaQueDaCadaConcierto),
+        sum_list(FamaQueDaCadaConcierto,TotalDeFama),
+        cantidadDeCancionesQueSabe(UnCantante,CantidadDeCancionesQueSabe),
+        UnaCantidadDeFama is TotalDeFama*CantidadDeCancionesQueSabe.
+
+        famaQueDaUnCocientoA(UnCantante,UnaCantidad):-
+            puedeParticiparDe(UnConcierto,UnCantante),
+            concierto(UnConcierto,_,UnaCantidad,_).
+
+
+%el primero conoce al segundo            
+conoce(megurineLuka,hatsuneMiku).
+conoce(megurineLuka,gumi).
+conoce(gumi,seeU).
+conocer(seeU,kaito).
+
+%para conocidos directos
+unicoParticipanteDe(UnConcierto,UnCantante):-
+    puedeParticiparDe(UnConcierto,UnCantante),
+    forall(esConocidoDe(UnCantante,OtroCantante),not(puedeParticiparDe(UnConcierto,OtroCantante))).
+    
+    %conocido directo
+    esConocidoDe(UnCantante,OtroCantante):-
+        conoce(UnCantante,OtroCantante).
+    %conocido indirecto
+    esConocidoDe(UnCantante,UnTercerCantante):-
+        conoce(UnCantante,OtroCantante),
+        conoce(OtroCantante,UnTercerCantante),
+        UnTercerCantante\=UnCantante.
