@@ -1,4 +1,6 @@
 import ricks.*
+import noPuedoIrmeDeViajeException.*
+
 
 class Mortys{
 	
@@ -14,12 +16,12 @@ class Mortys{
 		saludMental=unNumero
 	}
 	
-	method puedeIrDeAventuraConRick(){
-		return true
+	method nombre(){
+		return nombre
 	}
 }
 
-class Beths{
+class Beth{
 	
 	const nombre ="Beth"
 	var loQueRickLaQuiere
@@ -29,41 +31,37 @@ class Beths{
 		unRick.disminuirDemencia(20)
 	}
 	
-	method puedeIrdeDeAventuraConRick(){
-		return true
+	method nombre(){
+		return nombre
 	}
-	
 }
 
-class Summers{
+class Summers inherits Beth(nombre= "Summer"){
 	
-	const nombre ="Summer"
-	var rickLaQuiereMas
+	override method vaDeAventuraConRick(unRick){
+		if (self.esLunes())
+			super(unRick)
+			
+		else 
+			throw new NoPuedoIrmeDeViajeException(message="summer solo va de viaje los lunes")
+		}
 	
-	method vaDeAventuraConRick(unRcik){
-		rickLaQuiereMas = true
+	method esLunes (){
+		const hoyEs = new Date(/*day= , month= , year=¨*/ ).dayOfWeek() 
+		return hoyEs==monday	
+	} 
+	
 	}
-
-	method puedeIrDeAventuraConRick(){
-		if ((new Date().dayOfWeek)=== monday ){
-			return true
-		}
-		else {
-			return false
-		}
-	}
-
-}
 
 
 object jerry{
 	
 	const nombre = "Jerry"
-	method puedeIrDeAventuraConRick(){
-		return false
-	}
 	
 	method vaDeAventuraConRick(unRick){
-		throw new Exception (message="jerry es tonto no se puede ir de viaje")  
+		throw new NoPuedoIrmeDeViajeException (message="jerry es tonto no se puede ir de viaje")  
+	}
+	method nombre(){
+		return nombre
 	}
 }

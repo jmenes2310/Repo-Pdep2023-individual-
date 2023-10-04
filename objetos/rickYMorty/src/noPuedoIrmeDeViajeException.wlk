@@ -1,0 +1,4 @@
+class NoPuedoIrmeDeViajeException inherits Exception {
+	
+	
+}

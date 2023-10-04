@@ -1,4 +1,5 @@
 import familiares.*
+import noPuedoIrmeDeViajeException.*
 
 class Ricks {
 	var nivelDeDemencia
@@ -7,7 +8,7 @@ class Ricks {
 		try 
 			unAcompaniante.vaDeAventuraConRick(self)
 		
-		catch unaExepcion : Exception
+		catch exceptionQueNoVaDeViaje : NoPuedoIrmeDeViajeException
 			self.aumentarDemencia(1000)
 		
 	}
