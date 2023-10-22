@@ -1,0 +1,4 @@
+class NoSePuedeHacerElConsumoException inherits Exception {
+	
+	
+}

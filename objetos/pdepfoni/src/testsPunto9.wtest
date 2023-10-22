@@ -1,0 +1,33 @@
+import consumos.*
+import linea.*
+import packs.*
+import pdepfoni.*
+
+describe "testsPunto9"{
+	const hoy = new Date()
+const consumo = new ConsumoDeInternet(mbConsumidos=20,fechaConsumo=hoy)
+const pack1= new PackMbLibres(tieneVencimiento=false,mb=10,vencimiento= null)	
+const pack2= new PackCreditoDisponible(tieneVencimiento=false,credito=1,vencimiento=null)
+const pack3= new PackMbLibres(tieneVencimiento=true,mb=200,vencimiento= new Date(day=9,month=12,year=2019))
+const pack4= new PackMbLibres(tieneVencimiento=false,mb=5,vencimiento= null)
+const pack5= new PackMbLibres(tieneVencimiento=true,mb=15,vencimiento= new Date (day=12,month=12,year=2023))
+const linea= new Linea(numero=1,packs=[pack1,pack3,pack4,pack5],consumos=[consumo], tipoLinea= comun)
+	
+	
+test "testParaSaberSiCiertaLineaNoPuedeHacerUnConsumo" {
+	
+	assert.that(!linea.puedeHacer(consumo))
+	}
+	
+test "consume bien"{
+	const pack = new PackCreditoDisponible(tieneVencimiento=false,credito=4,vencimiento= null)
+	pack.consumir(consumo)
+	assert.equals(2,pack.credito())
+	
+	}
+
+test "consumidoElUltimoMes"{
+	assert.equals(2,linea.gastadoEnUltimoMes())
+}
+	
+}

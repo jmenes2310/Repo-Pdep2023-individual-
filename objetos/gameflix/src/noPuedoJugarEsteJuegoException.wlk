@@ -1,0 +1,4 @@
+class NoPuedoJugarEsteJuegoException inherits Exception{
+	
+	
+}
