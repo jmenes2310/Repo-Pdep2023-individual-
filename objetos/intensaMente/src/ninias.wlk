@@ -108,6 +108,12 @@ class Ninia{
 		const anioActual = new Date().year()
 		return memoriaLargoPlazo.filter({unRecuerdo=>unRecuerdo.anioEnQueOcurrio() < anioActual - self.edad()/2})
 	}
+	
+	method repeticionesDe(unRecuerdo){
+		return memoriaLargoPlazo.filter({recuerdo=>recuerdo == unRecuerdo }).size()
+	}
+	
+	method dejaVu()
 }
 
 object riley inherits Ninia(nombre="Riley",edad=11,nivelDeFelicidad=1000){
@@ -127,6 +133,10 @@ object riley inherits Ninia(nombre="Riley",edad=11,nivelDeFelicidad=1000){
 	
 	override method rememorar(){
 		pensamientoActual = self.recuerdosMasAntiguosQueMitadDeEdad().anyOne()
+	}
+	
+	override method dejaVu(){
+		self.repeticionesDe(pensamientoActual) > 1
 	}
 }
 

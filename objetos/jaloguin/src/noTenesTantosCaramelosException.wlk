@@ -1,0 +1,4 @@
+class NoTenesTantosCaramelosException inherits Exception{
+	
+	
+}

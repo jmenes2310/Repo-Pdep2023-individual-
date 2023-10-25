@@ -4,7 +4,8 @@ import packs.*
 import pdepfoni.*
 
 describe "testsPunto9"{
-	const hoy = new Date()
+
+const hoy = new Date()
 const consumo = new ConsumoDeInternet(mbConsumidos=20,fechaConsumo=hoy)
 const pack1= new PackMbLibres(tieneVencimiento=false,mb=10,vencimiento= null)	
 const pack2= new PackCreditoDisponible(tieneVencimiento=false,credito=1,vencimiento=null)

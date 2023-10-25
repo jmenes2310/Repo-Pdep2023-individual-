@@ -45,20 +45,9 @@ class Clientes {
 		saldo -=unaCantidad
 	}
 	
-	method jugar(unJuego){
+	method jugar(unJuego,unaHoras){
 		if (suscripcion.permiteJuagarA(unJuego)){
-			if (unJuego.esDeCategoria("violento")){
-				self.reducirHumor(10)
-			}
-			else if(unJuego.esDeCategoria("moba")){
-				self.ponerPlataAlJuego(300)
-			}
-			else if (unJuego.esDeCategoria("terror")){
-				self.actualizarSuscripcion(infantil)
-			}
-			else if(unJuego.esDeCategoria("estrategia")){
-				self.aumentarHumor(5)
-			}
+			unJuego.serJugadoPor(self,unaHoras)
 		}
 		else {
 			throw new NoPuedoJugarEsteJuegoException(message="tu suscripcion no te permite jugar este juego")

@@ -1,0 +1,4 @@
+class CantidadInsuficienteDeNiniosException inherits Exception {
+	
+	
+}

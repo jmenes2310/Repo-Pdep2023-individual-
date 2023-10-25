@@ -22,4 +22,6 @@ class Juego{
 		return precio < unPrecio
 	}
 	
+	method serJugadoPor()
+	
 }
