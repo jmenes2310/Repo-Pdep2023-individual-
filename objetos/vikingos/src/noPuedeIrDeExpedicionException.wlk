@@ -1,0 +1,4 @@
+class NoPuedeIrDeExpedicionException inherits Exception{
+	
+	
+}
