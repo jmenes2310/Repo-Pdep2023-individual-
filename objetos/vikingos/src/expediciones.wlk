@@ -10,7 +10,7 @@ class Expedicion {
 			vikingos.add(unVikingo)
 		}
 		else{
-			throw new NoPuedeIrDeExpedicionException
+			throw new NoPuedeIrDeExpedicionException()
 		}
 	}
 	
@@ -19,9 +19,13 @@ class Expedicion {
 	}
 	
 	method realizar(){
-		const botinObtenido = lugaresAInvadir.map({unLugar=>unLugar.monedadDeOro(vikingos)).sum()
+		const botinObtenido = self.botinAObtener()
 		self.dividirBotin(botinObtenido)
 		
+	}
+	
+	method botinAObtener(){
+		return lugaresAInvadir.sum({unLugar=>unLugar.monedasDeOro(vikingos)})
 	}
 	
 	method dividirBotin(unasMonedas){
@@ -44,6 +48,9 @@ class Capital {
 	method defensoresDerrotados(unosVikingos){
 		return unosVikingos.min(defensores)
 	}
+	method serInvadidoPor(unosVikingos){
+		defensores -= self.defensoresDerrotados(unosVikingos)
+	}
 }
 
 class Aldea{
@@ -56,6 +63,10 @@ class Aldea{
 	method valeLaPenaPara(unosVikingos){
 		return self.monedasDeOro(unosVikingos) >=15
 	}
+	
+	method serInvadidoPor(unosVikingos){
+		crucifijos=0
+	}	
 }	
 class AldeaAmurallada inherits Aldea{
 	const vikingosRequeridos

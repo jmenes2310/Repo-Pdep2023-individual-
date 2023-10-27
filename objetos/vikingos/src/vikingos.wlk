@@ -10,21 +10,31 @@ class Vikingo{
 	}
 	
 	method puederIrA(unaExpedicion){
-		return self.esProductivo && claseSocial.puedeSubir(self,unaExpedicion)
+		return self.esProductivo() && claseSocial.puedeSubir(self,unaExpedicion)
+	}
+
+	method ascenderSocialmente(){
+		claseSocial.ascender(self)
+	}
+	
+	method claseSocial(unaClase){
+		claseSocial=unaClase
 	}
 }
-
-
 class Soldado inherits Vikingo{
 	var property vidasCobradas
-	const armas = []
+	var armas
 	
 	override method esProductivo(){
 		return self.vidasCobradas() >20 && self.tieneArmas()
 	}
 	
 	method tieneArmas(){
-		return armas.size()>1
+		return armas >1
+	}
+	
+	method recompensaDeAscenso(){
+		armas += 10
 	}
 }
 
@@ -34,5 +44,10 @@ class Granjero inherits Vikingo{
 	
 	override method esProductivo(){
 		return hectareas == cantidadDeHijos *2
+	}
+	
+	method recompensaDeAscenso(){
+		hectareas += 2
+		cantidadDeHijos += 2
 	}
 }

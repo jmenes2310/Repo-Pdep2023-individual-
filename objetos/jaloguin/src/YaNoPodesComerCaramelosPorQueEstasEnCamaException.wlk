@@ -1,0 +1,4 @@
+class YaNoPodesComerCaramelosPorqueEstasEnCamaException inherits Exception {
+	
+	
+}
