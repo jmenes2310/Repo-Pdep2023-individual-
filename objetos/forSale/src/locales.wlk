@@ -29,7 +29,7 @@ object aLaCalle{
 	var montoFijo
 	
 	method montoFijo(unMonto){
-		montonFijo=unMonto
+		montoFijo=unMonto
 	}
 	
 	method valorFinal(unPrecio){
