@@ -1,0 +1,4 @@
+class NoEsUnSuenioPorCumplirException inherits Exception{
+	
+	
+}

@@ -1,0 +1,4 @@
+class NoPasaValidacionException inherits Exception {
+	
+	
+}
