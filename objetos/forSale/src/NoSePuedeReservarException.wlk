@@ -1,0 +1,4 @@
+class NoSePuedeReservarException inherits Exception {
+	
+	
+}
