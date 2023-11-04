@@ -31,8 +31,8 @@ class FiguraElaborada inherits Adorno{
 class Guirnalda inherits Adorno{
 	const anioDeAdquisicion	
 	
-	override method peso(){
-		return super() - 100*self.aniosDesdeAdquisicion()
+	method pesoActual(){
+		return pesoBase - 100*self.aniosDesdeAdquisicion()
 		
 	}
 	
